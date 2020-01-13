@@ -3,6 +3,7 @@ from .node import Node
 from .calculator import Calculator
 from .const import *
 import sys
+import time
 
 class MCTS:
     def __init__(self, op1, op2, variables, dataset):
@@ -13,6 +14,13 @@ class MCTS:
 
         self.root = Node("U")
         self.best = None
+
+        self.timers = {
+            "sel": 0,
+            "exp": 0,
+            "sim": 0,
+            "bkp": 0
+        }
 
     def get_tree(self, node = None):
         if node == None:
@@ -31,6 +39,7 @@ class MCTS:
 
     def selection(self, node):
         while True:
+            #print(node)
             if node.is_expanded() == False:
                 return node
             
@@ -39,6 +48,17 @@ class MCTS:
 
     def expansion(self, node):
         node.expand(self.op1, self.op2, self.variables)
+        # calculate reward for terminal nodes
+        score = 0
+
+        for child in node.children:
+            if child.is_terminal():
+                score = Calculator.score(self.dataset, child.grammar)
+                child.w = score
+                if score ==  1:
+                    return child
+        
+        return None
 
     def simulation(self, node):
         self.expansion(node)
@@ -48,8 +68,8 @@ class MCTS:
             reward_nodes = [n for n in node.children if n.is_terminal()]
             if len(reward_nodes) > 0:
                 score = 0
-                for n in reward_nodes:
-                    score += Calculator.score(self.dataset, n.grammar)
+                for reward_node in reward_nodes:
+                    score += reward_node.w
                 reward = score / len(reward_nodes)
             else: # no rewards - expand randomly
                 available_nodes = [n for n in node.children if not n.is_terminal()]
@@ -65,42 +85,36 @@ class MCTS:
             score = 0
             total = 0
             for child in node.children:
-                if child.is_terminal() and child.w == sys.maxsize:
-                    child.w = Calculator.score(self.dataset, child.grammar)
                 if child.w != sys.maxsize:
                     score += child.w
                     total += 1
             node.w = score / total
             node = node.parent
 
-    def find_best_solution(self, node):
-        if node.is_terminal():
-            return node
-
-        selected = None
-
-        for child in node.children:
-            local = self.find_best_solution(child)
-            if local != None:
-                if selected == None:
-                    selected = local
-                else:
-                    if local.w > selected.w:
-                        selected = local
-        
-        return selected
-
+ 
     def iterate(self):
+        t = time.time()
         selected_node = self.selection(self.root)
-        self.expansion(selected_node)
+        self.timers["sel"] += time.time() - t
+
+        t = time.time()
+        solution = self.expansion(selected_node)
+        if solution:
+            print(solution)
+            print(self.timers)
+            return True
+
+        self.timers["exp"] += time.time() - t
+
+        t = time.time()
         available_nodes = [n for n in selected_node.children if not n.is_terminal()]
         simulation_node = random.choice(available_nodes)
         simulation_node.w = self.simulation(simulation_node)
         simulation_node.prune()
+        self.timers["sim"] += time.time() - t
+
+        t = time.time()
         self.backpropagation(simulation_node)
-        best_node = self.find_best_solution(self.root)
-        
-        if best_node.w == 1:
-            print(best_node)
-            return True
+        self.timers["bkp"] += time.time() - t
+
         return False

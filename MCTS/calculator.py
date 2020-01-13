@@ -4,11 +4,15 @@ from .score import Score
 
 class Calculator():
     @staticmethod
-    def _calc(values, expression):
+    def _calc(values, expression, constants={}):
         stack = deque() 
         for c in expression:
+            # variables
             if ord(c) in range(ord('a'), ord('z')):
                 stack.append(values[c])
+            # constants
+            if ord(c) in range(ord('A'), ord('Z')):
+                stack.append(constants[c])
             # op1
             elif c == '!':
                 value_1 = stack.pop()
@@ -16,6 +20,17 @@ class Calculator():
             elif c == '~':
                 value_1 = stack.pop()
                 stack.append(~value_1)
+            elif c == '#':
+                value_1 = stack.pop()
+                stack.append(
+                    ((value_1 << 56) & 0xFF00000000000000) |
+                    ((value_1 << 40) & 0x00FF000000000000) |
+                    ((value_1 << 24) & 0x0000FF0000000000) |
+                    ((value_1 <<  8) & 0x000000FF00000000) |
+                    ((value_1 >>  8) & 0x00000000FF000000) |
+                    ((value_1 >> 24) & 0x0000000000FF0000) |
+                    ((value_1 >> 40) & 0x000000000000FF00) |
+                    ((value_1 >> 56) & 0x00000000000000FF)) 
             # op2
             elif c == '+':
                 value_2 = stack.pop() 
