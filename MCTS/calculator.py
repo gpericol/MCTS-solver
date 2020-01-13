@@ -5,7 +5,8 @@ from .score import Score
 class Calculator():
     @staticmethod
     def _calc(values, expression, constants={}):
-        stack = deque() 
+        
+        stack = deque()
         for c in expression:
             # variables
             if ord(c) in range(ord('a'), ord('z')):
@@ -61,8 +62,15 @@ class Calculator():
     
     @staticmethod
     def score(dataset, expression):
+        
+        A = 11111111111111111111
+        B = 12121212121212121212
+        C = 31313131313131313131
+
+        constants = {'A': A, 'B': B, 'C':C}
+
         distances = []
         for data in dataset:
-            result = Calculator._calc(data, expression)
+            result = Calculator._calc(data, expression, constants)
             distances.append(Score.distance_metric(data['result'], result, BIT_SIZE))
         return sum(distances) / len(distances) 

@@ -3,12 +3,13 @@ from MCTS.oracle import OracleRPN
 from MCTS.mcts import MCTS
 import time
 
-#dataset = OracleRPN.dataset()
-dataset = Oracle.dataset()
+dataset = OracleRPN.dataset()
+#dataset = Oracle.dataset()
+
+#mcts = MCTS(['!', '~'], ["+", "-", "*", "&", "|", "^"] ,["a", "b", "c"], dataset)
+mcts = MCTS(["#"], ["+", "-", "&", "|"] ,["a"], ["A", "B", "C"], dataset)
 
 
-mcts = MCTS(['!', '~'], ["+", "-", "*", "&", "|", "^"] ,["a", "b", "c"], dataset)
-#mcts = MCTS([], ["+", "-", "*", "&", "|", "^"] ,["a", "b", "c"], dataset)
 start_time = time.time()
 count = 0
 while count < 1000000 and not mcts.iterate():
@@ -18,3 +19,5 @@ while count < 1000000 and not mcts.iterate():
 
 print(count)
 print("--- %s seconds ---" % (time.time() - start_time))
+
+

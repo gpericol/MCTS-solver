@@ -1,2 +1,2 @@
 BIT_SIZE = 64
-C = 1.3
+UTC_CONST = 1.3

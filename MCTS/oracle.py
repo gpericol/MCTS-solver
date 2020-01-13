@@ -23,9 +23,10 @@ class OracleRPN:
     @staticmethod
     def phi(a):
         A = 11111111111111111111
-        B = 22222222222222222222
-        C = 33333333333333333333
-        expression = "BaA&#-a|C+"
+        B = 12121212121212121212
+        C = 31313131313131313131
+        #expression = "BaA&#-a|C+"
+        expression = "BaA&-a|C+"
         return Calculator._calc({'a': a}, expression, {'A': A, 'B': B, 'C':C})
 
     @staticmethod

@@ -1,5 +1,6 @@
 import sys
 from .const import *
+from .grammar import Grammar
 import math
 
 class Node(object):
@@ -29,24 +30,10 @@ class Node(object):
         if self.n == 0:
             return sys.maxsize
 
-        return self.w + C * math.sqrt(math.log(self.parent.n) / self.n)
+        return self.w + UTC_CONST * math.sqrt(math.log(self.parent.n) / self.n)
 
-    def expand(self, op1, op2, variables):
-        grammars = []
-        for i in range(len(self.grammar)):
-            if self.grammar[i] == "U":
-                before_grammar = self.grammar[:i]
-                after_grammar = self.grammar[(i+1):]
-                for variable in variables:
-                    new_grammar = before_grammar + variable + after_grammar
-                    grammars.append(new_grammar)
-                for op in op1:
-                    new_grammar = before_grammar + "U" + op + after_grammar
-                    grammars.append(new_grammar)
-                for op in op2:
-                    new_grammar = before_grammar + "UU" + op + after_grammar
-                    grammars.append(new_grammar)
-                
+    def expand(self, op1, op2, variables, constants):
+        grammars = Grammar.generate(self.grammar, variables, constants, op1, op2)                
         for grammar in grammars:
             self.children.append(Node(grammar, self))
 
