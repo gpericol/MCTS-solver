@@ -44,7 +44,12 @@ class MCTS:
             if node.is_expanded() == False:
                 return node
             
-            available_nodes = [n for n in node.children if not n.is_terminal()]
+            available_nodes = [n for n in node.children if not n.is_terminal() and not n.is_fully_extended()]
+            if len(available_nodes) == 0:
+                print(node)
+                for c in node.children:
+                    print(c)
+                
             node = max(available_nodes, key=lambda x: x.uct())
 
     def expansion(self, node):
@@ -84,22 +89,30 @@ class MCTS:
             node.n += 1
             score = 0
             total = 0
+            extended = 0
             for child in node.children:
                 if child.w != sys.maxsize:
                     score += child.w
                     total += 1
+                if child.is_terminal() or child.is_fully_extended():
+                    extended +=1
             node.w = score / total
+            if len(node.children) == extended:
+                node._is_fully_extended = True
+                node.prune()
             node = node.parent
 
-    def iterate(self):
+    def iterate(self, verbose=False):
         t = time.time()
         
         selected_node = self.selection(self.root)
+        if verbose:
+            print(selected_node)
         
         self.timers["sel"] += time.time() - t
 
         t = time.time()
-        
+
         solution = self.expansion(selected_node)
         if solution:
             print(solution)
@@ -111,8 +124,14 @@ class MCTS:
         t = time.time()
         
         available_nodes = [n for n in selected_node.children if not n.is_terminal()]
-        simulation_node = random.choice(available_nodes)
-        simulation_node.w = self.simulation(simulation_node)
+        # syntax limit reached -> just backpropagate from a random child
+        if len(available_nodes) == 0:
+            #print(f"Fully Extended: {selected_node}")
+            selected_node._is_fully_extended = True
+            simulation_node = random.choice(selected_node.children)
+        else:
+            simulation_node = random.choice(available_nodes)
+            simulation_node.w = self.simulation(simulation_node)
         
         self.timers["sim"] += time.time() - t
 

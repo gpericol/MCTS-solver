@@ -13,8 +13,9 @@ class Grammar:
                     new_grammar = before_grammar + variable + after_grammar
                     grammars.append(new_grammar)
                 for constant in constants:
-                    new_grammar = before_grammar + constant + after_grammar
-                    grammars.append(new_grammar)
+                    if constant not in grammar:
+                        new_grammar = before_grammar + constant + after_grammar
+                        grammars.append(new_grammar)
                 for op in op1:
                     new_grammar = before_grammar + "U" + op + after_grammar
                     grammars.append(new_grammar)
@@ -27,8 +28,10 @@ class Grammar:
     @staticmethod
     def generate_nop(grammar, variables, constants, op1, op2):
         grammars = []
-        elements = variables + constants
-
+        elements = []
+        elements += variables
+        elements += constants
+        
         tot = grammar.count("U")
 
         for j in range(5):

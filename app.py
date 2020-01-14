@@ -12,7 +12,7 @@ mcts = MCTS(["#"], ["+", "-", "&", "|"] ,["a"], ["A", "B", "C"], dataset)
 
 start_time = time.time()
 count = 0
-while count < 1000000 and not mcts.iterate():
+while count < 1000000 and not mcts.iterate(count % 1000 == 0):
     count += 1
     if count % 1000 == 0:
         print(count)

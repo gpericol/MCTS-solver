@@ -12,11 +12,15 @@ class Node(object):
         self.w = sys.maxsize
 
         self._is_terminal = "U" not in grammar
+        self._is_fully_extended = False
         self.children = []
         self.parent = parent
 
     def is_terminal(self):
         return self._is_terminal
+
+    def is_fully_extended(self):
+        return self._is_fully_extended
 
     def is_expanded(self):
         return len(self.children) > 0
@@ -35,7 +39,8 @@ class Node(object):
     def expand(self, op1, op2, variables, constants):
         grammars = Grammar.generate(self.grammar, variables, constants, op1, op2)                
         for grammar in grammars:
-            self.children.append(Node(grammar, self))
+            if len(grammar) <= NODE_SYNTAX_LIMIT:
+                self.children.append(Node(grammar, self))
 
     def prune(self):
         for child in self.children:

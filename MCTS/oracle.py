@@ -26,7 +26,7 @@ class OracleRPN:
         B = 12121212121212121212
         C = 31313131313131313131
         #expression = "BaA&#-a|C+"
-        expression = "BaA&-a|C+"
+        expression = "BaA&#-a|C+"
         return Calculator._calc({'a': a}, expression, {'A': A, 'B': B, 'C':C})
 
     @staticmethod
