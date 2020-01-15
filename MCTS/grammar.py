@@ -17,6 +17,8 @@ class Grammar:
                         new_grammar = before_grammar + constant + after_grammar
                         grammars.append(new_grammar)
                 for op in op1:
+                    if len(after_grammar) > 0 and op == after_grammar[0]:
+                        continue
                     new_grammar = before_grammar + "U" + op + after_grammar
                     grammars.append(new_grammar)
                 for op in op2:

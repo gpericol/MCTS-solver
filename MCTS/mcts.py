@@ -63,6 +63,10 @@ class MCTS:
                 child.w = score
                 if score ==  1:
                     return child
+                
+                if self.best == None or self.best.w < child.w:
+                    self.best = child
+                    print(child)
         
         return None
     
